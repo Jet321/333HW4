@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.*;
-import java.security.KeyStore.Entry;
 public class App {
 
     //d[i] = outdegree of node i
@@ -85,6 +84,8 @@ public class App {
     //contributions to scores from edges (the 0.85/diterms) and from the random teleportation. If you get stuck on this question, 
     //you can still try the subsequent questions with a more straight forward implementation.
 
+    //BROKEN IMPLEMENTATION IN O(N) TIME
+
     static void getEfficientScores(double threshold) {
         double nodecount = adjList.keySet().size();
         double sinknodecount = sinkNodes.size();
@@ -119,8 +120,6 @@ public class App {
                 
                 System.out.println("After case 1, newvalue =  " + newValue);
                 //case2
-                
-
                 //for all nodes not pointing to A with degree > 0, we add .15/n to probability
                 newValue+= notedgenotsinkcount * .15/nodecount * scores.get(t-1).get(node1);
 
@@ -138,41 +137,31 @@ public class App {
 
             }
             System.out.println("end of iteration");
-
-            
             if (underTreshold(t, threshold)) {
-                System.out.print("breaking at iteration:" + t + "\n");
+                System.out.println("converged at iteration: " + t);
                 break;
             }
             
         }
     }
-    
+    //WORKING IMPLEMENTATION IN O(N^2) TIME
     static void getScores(double threshold) {
         scores.put(0, new HashMap<String, Double>());
-        for (String node : adjList.keySet()) {
-            scores.get(0).put(node, 1 / (double)adjList.keySet().size());
-        }
-     
+        //initialize scores[t=0][nodej] to 1/n 
+        for (String node : adjList.keySet()) scores.get(0).put(node, 1 / (double)adjList.keySet().size());
+        // iterating until TVD < threshold
         for (int t = 1; t <= Integer.MAX_VALUE; t++) {
             scores.put(t, new HashMap<String, Double>());
             for (String nodej : adjList.keySet()) {
-                //System.out.println(nodej);
-            //String nodej = "A";
                 double newvalue = 0.0;
                 for (String nodei : adjList.keySet()) {
-                    //System.out.println(nodei);
                     newvalue += transitionmatrix.get(nodei + nodej) * scores.get(t-1).get(nodei);
-                    //System.out.println("newValue = " + newvalue);
-                    //System.out.print()
-                    
                 }
                 scores.get(t).put(nodej, newvalue);
-
             }
             //System.out.println("end of iteration");
             if (underTreshold(t, threshold)) {
-                System.out.println("Converged at iteration:" + t);
+                System.out.println("Converged at iteration: " + t);
                 break;
             }
         }
