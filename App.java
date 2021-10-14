@@ -8,6 +8,7 @@ public class App {
     static HashMap<String, ArrayList<String>> adjList = new HashMap();
     // initial array of page rank scores
     static HashMap<Integer, HashMap<String, Double>> scores = new HashMap<>();
+    static HashMap<String, Double> queryResults = new HashMap<>();
 
     static HashMap<String, Double> transitionmatrix = new HashMap();
     static ArrayList<String> sinkNodes = new ArrayList<>();
@@ -96,7 +97,8 @@ public class App {
         for (String node : adjList.keySet()) {
             scores.get(0).put(node, 1.0 / (double)adjList.keySet().size());
         }
-        for (int t = 1; t <= 2; t++) {
+        for (int t = 1; t <= 1; t++) {
+            
             scores.put(t, new HashMap<String, Double>());
             //String node1 = "A";
             for (String node1 : adjList.keySet()) {
@@ -150,7 +152,7 @@ public class App {
         //initialize scores[t=0][nodej] to 1/n 
         for (String node : adjList.keySet()) scores.get(0).put(node, 1 / (double)adjList.keySet().size());
         // iterating until TVD < threshold
-        for (int t = 1; t <= Integer.MAX_VALUE; t++) {
+        for (int t = 1; t <= 1; t++) {
             scores.put(t, new HashMap<String, Double>());
             for (String nodej : adjList.keySet()) {
                 double newvalue = 0.0;
@@ -198,8 +200,21 @@ public class App {
         
         System.out.print(n);
     }
+    static void searchResults(String query) { 
+        System.out.println("\nPrinting search results");
+
+        int lastindex = scores.size()-1;
+        for (String name : scores.get(lastindex).keySet()) {
+            if (name.contains(query)) {
+                System.out.println(name + ": " + scores.get(lastindex).get(name));
+            }
+
+        }
+
+    }
     public static void main(String[] args) throws FileNotFoundException{
         double threshold = .001;
+        String query = "Jim";
 
         //GET NODES FROM FILE
         String nodefile = "test_nodes.txt";
@@ -216,8 +231,10 @@ public class App {
 
         buildGraph(nodes, edges);
         generateMatrix();
-        getScores(threshold);
+        getEfficientScores(threshold);
+
         printScores();
+        //searchResults(query);
 
 
 
